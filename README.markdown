@@ -134,3 +134,39 @@ sh 'powershell -ExecutionPolicy Unrestricted -File deployments\mongo\MigrateMong
 Testing migrations
 --
 
+Here is a sample test to rename a key on a document via the BsonDocument api, obviously this is a trivial case but you can see how you can leverage manipulations of the BsonDocument api to test your migrations.  Also, you could create migration databases and prepopulate them with sample data when using the mongo json api.
+
+```csharp
+	[Test]
+	public void MigrationToRenameNameToFullName_HasNameKey_RenamesToFullName()
+	{
+		var nameKey = "Name";
+		var nameValue = "Bob";
+		var document = new BsonDocument {{nameKey, nameValue}};
+		var migration = new MigrationToRenameNameToFullName();
+
+		migration.Rename(document);
+
+		Expect(document.Contains(nameKey), Is.False);
+		var fullNameKey = "FullName";
+		Expect(document[fullNameKey].AsString, Is.EqualTo(nameValue));
+	}
+
+	public class MigrationToRenameNameToFullName : CollectionMigration
+	{
+		public MigrationToRenameNameToFullName() : base("1.5.10", "Users")
+		{
+		}
+
+		public override void UpdateDocument(MongoCollection<BsonDocument> collection, BsonDocument document)
+		{
+			collection.Save(document);
+		}
+
+		public void Rename(BsonDocument document)
+		{
+			document.Add("FullName", document["Name"]);
+			document.Remove("Name");
+		}
+	}
+```
