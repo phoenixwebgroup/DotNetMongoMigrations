@@ -30,7 +30,7 @@ Migration recommendations
 1. Stick to the mongo BsonDocument interface or use javascript based mongo commands for migrations, much like with SQL, the mongo javascript API is less likely to change which might break migrations
 1. Add an application startup check that the database is at the correct version
 1. Write tests of your migrations, TDD them from existing data scenarios to new forms
-1. Automate the deployment of migrations with application deployment (backup the database and then apply migrations, on a failure restore the database)
+1. Automate the deployment of migrations
 
 Migration 
 --
@@ -116,6 +116,20 @@ Simply plug the following code into your application startup, whether that be a 
 
 Using migrations with a deployment process
 --
+
+Document databases for the most do not support transactions with rollback, therefore it's a good idea to backup a database before applying migrations.  Also, in order to reduce the manual work involved and the risk of error, it's a good idea to automate your migration deployments.  Mongo supports a backup and restore utility out of the box, this can be combined with the migrations above to provide an automated deployment of the migrations.
+
+Here is a sample powershell script we use to automate this deployment
+
+(Migration PowerShell Script)[https://github.com/g0t4/DotNetMongoMigrations/blob/master/MigrateMongo.ps1]
+
+It takes parameters for server name/ip, database name, base backup directory and migration dll path
+
+We execute it from our rake deployment via:
+
+```ruby
+sh 'powershell -ExecutionPolicy Unrestricted -File deployments\mongo\MigrateMongo.ps1 ' + host + ' databaseName deployments\mongo\backup build\Migrations.dll '
+```
 
 Testing migrations
 --
