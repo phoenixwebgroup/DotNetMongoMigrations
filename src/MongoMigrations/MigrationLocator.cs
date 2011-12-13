@@ -18,6 +18,11 @@
 		public virtual void LookForMigrationsInAssemblyOfType<T>()
 		{
 			var assembly = typeof (T).Assembly;
+			LookForMigrationsInAssembly(assembly);
+		}
+
+		public void LookForMigrationsInAssembly(Assembly assembly)
+		{
 			if (Assemblies.Contains(assembly))
 			{
 				return;

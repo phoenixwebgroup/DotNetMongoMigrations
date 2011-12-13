@@ -9,15 +9,22 @@ namespace MongoMigrations
 
 	public class MigrationRunner
 	{
+		private readonly string _MongoServerLocation;
 		public static ILog Log = LogManager.GetLogger("MongoMigrations");
 
 		static MigrationRunner()
+		{
+			Init();
+		}
+
+		public static void Init()
 		{
 			BsonSerializer.RegisterSerializer(typeof (MigrationVersion), new MigrationVersionSerializer());
 		}
 
 		public MigrationRunner(string mongoServerLocation, string databaseName)
 		{
+			_MongoServerLocation = mongoServerLocation;
 			Database = MongoServer.Create(mongoServerLocation).GetDatabase(databaseName);
 			DatabaseStatus = new DatabaseMigrationStatus(this);
 			MigrationLocator = new MigrationLocator();
@@ -29,7 +36,7 @@ namespace MongoMigrations
 
 		public virtual void UpdateToLatest()
 		{
-			Log.Info("Updating to latest");
+			Log.Info("Updating " + _MongoServerLocation + " to latest");
 			UpdateTo(MigrationLocator.LatestVersion());
 		}
 
