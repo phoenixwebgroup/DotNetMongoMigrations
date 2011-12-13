@@ -14,13 +14,6 @@ However, we need migrations when:
 
 So the idea is to have a simple migration script that executes commands against Mongo.  It should track the applied migrations and quickly be able to apply new migrations.
 
-Migration recommendations
---
-
-1. Keep them as simple as possible
-1. Do not couple migrations to your domain types, they will be brittle to change, and the point of a migration is to update the data representation when your model changes.
-1. Stick to the mongo BsonDocument interface or use javascript based mongo commands for migrations, much like with SQL, the mongo javascript API is less likely to change which might break migrations
-
 Why DotNetMongoMigrations?
 --
 
@@ -29,7 +22,17 @@ Why DotNetMongoMigrations?
 1. Leverage existing NUnit test projects or other test projects to test migrations
 1. Provide an automatable foundation to track and apply migrations.
 
-Simple Migration 
+Migration recommendations
+--
+
+1. Keep them as simple as possible
+1. Do not couple migrations to your domain types, they will be brittle to change, and the point of a migration is to update the data representation when your model changes.
+1. Stick to the mongo BsonDocument interface or use javascript based mongo commands for migrations, much like with SQL, the mongo javascript API is less likely to change which might break migrations
+1. Add an application startup check that the database is at the correct version
+1. Write tests of your migrations, TDD them from existing data scenarios to new forms
+1. Automate the deployment of migrations with application deployment (backup the database and then apply migrations, on a failure restore the database)
+
+Migration 
 --
 
 This is a simple migration that executes a mongo javascript command to rename the Customer key from Name to FullName.
@@ -81,14 +84,39 @@ Sometimes we want to work on a migration but it's not complete yet, these can be
 	{
 ```
 
-
-
-MISC to be updated
+Running Migrations
 --
 
-Just a note, this will create a collection in your database called DatabaseVersion that holds the migration version numbers, this is customizable.
+The project provides a MigrationRunner which contains:
 
-Getting started
-1. Extend the MigrationRunner and couple it to a session per each database that you have.  In the constructor, make a call to the assembly with migrations so it knows where to scan for migrations.
-2. Hook the MigrationRunner up to application startup.
-4. Test your migrations, the migration class is independent and can be run on fake data, even the Collection Migration can be tested.
+* DatabaseMigrationStatus
+ * Contains methods to monitor the version of the database.
+ * Applied migrations are stored in a collection named "DatabaseVersion", this can be configured via the VersionCollectionName instance property.  
+* MigrationLocator
+ * Scans the provided assemblies for migrations
+ * Filters on experimental by default.  
+ * Filters can be added/removed via the MigrationLocator.MigrationFilters list.
+
+Sample App Startup Version Check
+--
+
+Simply plug the following code into your application startup, whether that be a web or service app, to terminate the application if the database is not at the expected version.  This assumes you have mongo server location and database name in a settings file and that Migration1 is in the assembly containing migrations to be scanned for.
+
+```csharp
+	public class CheckDbVersionOnStartup : IRunOnApplicationStart
+	{
+		public void Start()
+		{
+			var runner = new MigrationRunner(Settings.Default.MongoServerLocation, Settings.Default.MongoDatabaseName);
+			runner.MigrationLocator.LookForMigrationsInAssemblyOfType<Migration1>();
+			runner.DatabaseStatus.ThrowIfNotLatestVersion();
+		}
+	}
+```
+
+Using migrations with a deployment process
+--
+
+Testing migrations
+--
+
