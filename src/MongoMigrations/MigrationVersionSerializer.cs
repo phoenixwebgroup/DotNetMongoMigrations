@@ -14,7 +14,7 @@ namespace MongoMigrations
 			bsonWriter.WriteString(versionString);
 		}
 
-		public override object Deserialize(BsonReader bsonReader, Type nominalType, IBsonSerializationOptions options)
+		public override object Deserialize(BsonReader bsonReader, Type nominalType, Type actualType, IBsonSerializationOptions options)
 		{
 			var versionString = bsonReader.ReadString();
 			return new MigrationVersion(versionString);
