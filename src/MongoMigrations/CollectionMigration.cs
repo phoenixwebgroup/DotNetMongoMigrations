@@ -14,7 +14,7 @@ namespace MongoMigrations
 			CollectionName = collectionName;
 		}
 
-		public virtual QueryDocument Filter()
+		public virtual IMongoQuery Filter()
 		{
 			return null;
 		}
@@ -26,7 +26,7 @@ namespace MongoMigrations
 			UpdateDocuments(collection, documents);
 		}
 
-		protected virtual void UpdateDocuments(MongoCollection<BsonDocument> collection, IEnumerable<BsonDocument> documents)
+		public virtual void UpdateDocuments(MongoCollection<BsonDocument> collection, IEnumerable<BsonDocument> documents)
 		{
 			foreach (var document in documents)
 			{
@@ -55,7 +55,7 @@ namespace MongoMigrations
 			throw new MigrationException(message.ToString(), exception);
 		}
 
-		protected abstract void UpdateDocument(MongoCollection<BsonDocument> collection, BsonDocument document);
+		public abstract void UpdateDocument(MongoCollection<BsonDocument> collection, BsonDocument document);
 
 		protected virtual MongoCollection<BsonDocument> GetCollection()
 		{
