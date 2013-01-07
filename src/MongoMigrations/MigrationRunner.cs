@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace MongoMigrations
 {
 	using System;
@@ -5,13 +7,9 @@ namespace MongoMigrations
 	using System.Linq;
 	using MongoDB.Bson.Serialization;
 	using MongoDB.Driver;
-	using log4net;
 
 	public class MigrationRunner
 	{
-		private readonly string _MongoServerLocation;
-		public static ILog Log = LogManager.GetLogger("MongoMigrations");
-
 		static MigrationRunner()
 		{
 			Init();
@@ -19,16 +17,21 @@ namespace MongoMigrations
 
 		public static void Init()
 		{
-			BsonSerializer.RegisterSerializer(typeof (MigrationVersion), new MigrationVersionSerializer());
+			BsonSerializer.RegisterSerializer(typeof(MigrationVersion), new MigrationVersionSerializer());
 		}
 
-		public MigrationRunner(string mongoServerLocation, string databaseName)
+		public MigrationRunner(string connectionString, string databaseName)
 		{
-			_MongoServerLocation = mongoServerLocation;
-			Database = MongoServer.Create(mongoServerLocation).GetDatabase(databaseName);
+            var client = new MongoClient(connectionString);
+			Database = client.GetServer().GetDatabase(databaseName);
 			DatabaseStatus = new DatabaseMigrationStatus(this);
 			MigrationLocator = new MigrationLocator();
 		}
+
+        public MigrationRunner(MongoDatabase database)
+        {
+            Database = database;
+        }
 
 		public MongoDatabase Database { get; set; }
 		public MigrationLocator MigrationLocator { get; set; }
@@ -36,7 +39,7 @@ namespace MongoMigrations
 
 		public virtual void UpdateToLatest()
 		{
-			Log.Info("Updating " + _MongoServerLocation + " to latest");
+            Trace.TraceInformation("Updating {0} to latest...", Database.Name);
 			UpdateTo(MigrationLocator.LatestVersion());
 		}
 
@@ -48,7 +51,7 @@ namespace MongoMigrations
 
 		protected virtual void ApplyMigration(Migration migration)
 		{
-			Log.Info(new {Message = "Applying migration", migration.Version, migration.Description, DatabaseName = Database.Name});
+            Trace.TraceInformation("Applying migration \"{0}\" for version {1} to database \"{2}\".", migration.Description, migration.Version, Database.Name);
 
 			var appliedMigration = DatabaseStatus.StartMigration(migration);
 			migration.Database = Database;
@@ -65,15 +68,15 @@ namespace MongoMigrations
 
 		protected virtual void OnMigrationException(Migration migration, Exception exception)
 		{
-			var message = new {Message = "Migration failed to be applied: ", migration.Version, Name = migration.GetType(), migration.Description, DatabaseName = Database.Name};
-			Log.Error(message, exception);
-			throw new MigrationException(message.ToString(), exception);
+            string message = String.Format("Failed applying migration \"{0}\" for version {1} to database \"{2}\": {3}", migration.Description, migration.Version, Database.Name, exception.Message);
+            Trace.TraceError(message);
+            throw new MigrationException(message, exception);
 		}
 
 		public virtual void UpdateTo(MigrationVersion updateToVersion)
 		{
 			var currentVersion = DatabaseStatus.GetLastAppliedMigration();
-			Log.Info(new {Message = "Updating", currentVersion, updateToVersion, DatabaseName = Database.Name});
+            Trace.TraceInformation("Updating migration \"{0}\" for version {1} to database \"{2}\".", currentVersion, updateToVersion, Database.Name);
 
 			var migrations = MigrationLocator.GetMigrationsAfter(currentVersion)
 				.Where(m => m.Version <= updateToVersion);
