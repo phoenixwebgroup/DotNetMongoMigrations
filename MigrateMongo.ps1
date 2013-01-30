@@ -12,7 +12,6 @@ $migrationFrameworkAssemblyPath = join-path ([IO.Path]::GetDirectoryName($migrat
 [System.Reflection.Assembly]::LoadFrom($migrationFrameworkAssemblyPath)
 
 # Create migration runner and load migrations
-[log4net.Config.BasicConfigurator]::Configure()
 $runner = new-object MongoMigrations.MigrationRunner(('mongodb://' + $server), $database)
 $runner.MigrationLocator.LookForMigrationsInAssembly($migrationsAssembly)
 
