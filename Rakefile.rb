@@ -24,5 +24,5 @@ task :clean do
 end
 
 task :nuget => [:build] do
-	sh "nuget pack src\\MongoMigrations\\MongoMigrations.csproj /OutputDirectory " + $nugetFeedPath
+	sh "src\\.nuget\\nuget pack src\\MongoMigrations\\MongoMigrations.csproj /OutputDirectory " + $nugetFeedPath
 end
