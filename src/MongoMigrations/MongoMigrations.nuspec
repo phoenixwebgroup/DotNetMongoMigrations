@@ -3,10 +3,10 @@
   <metadata>
     <id>MongoMigrations</id>
     <version>$version$</version>
-    <authors>https://github.com/g0t4/DotNetMongoMigrations</authors>
+    <authors>https://github.com/phoenixwebgroup/DotNetMongoMigrations</authors>
     <owners></owners>
-    <licenseUrl>https://github.com/g0t4/DotNetMongoMigrations</licenseUrl>
-    <projectUrl>https://github.com/g0t4/DotNetMongoMigrations</projectUrl>
+    <licenseUrl>https://github.com/phoenixwebgroup/DotNetMongoMigrations</licenseUrl>
+    <projectUrl>https://github.com/phoenixwebgroup/DotNetMongoMigrations</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Mongo migrations for dot net developers</description>
     <tags>Mongo Migrations</tags>
