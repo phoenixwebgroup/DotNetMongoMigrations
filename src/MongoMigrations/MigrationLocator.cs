@@ -42,7 +42,7 @@
 			try
 			{
 				return assembly.GetTypes()
-					.Where(t => typeof (Migration).IsAssignableFrom(t))
+					.Where(t => typeof (Migration).IsAssignableFrom(t) && !t.IsAbstract)
 					.Select(Activator.CreateInstance)
 					.OfType<Migration>()
 					.Where(m => !MigrationFilters.Any(f => f.Exclude(m)));
