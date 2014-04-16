@@ -18,8 +18,18 @@ namespace MongoMigrations
 			BsonSerializer.RegisterSerializer(typeof (MigrationVersion), new MigrationVersionSerializer());
 		}
 
-		public MigrationRunner(string mongoServerLocation, string databaseName)
-			: this(MongoServer.Create(mongoServerLocation).GetDatabase(databaseName))
+		public MigrationRunner(string connectionString)
+			: this(new MongoUrl(connectionString))
+		{
+		}
+
+		public MigrationRunner(string connectionString, string databaseName)
+			: this(new MongoClient(connectionString).GetServer().GetDatabase(databaseName))
+		{
+		}
+
+		public MigrationRunner(MongoUrl mongoUrl)
+			: this(new MongoClient(mongoUrl).GetServer().GetDatabase(mongoUrl.DatabaseName))
 		{
 		}
 
