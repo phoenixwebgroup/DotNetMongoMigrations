@@ -42,10 +42,15 @@ namespace MongoMigrations
 
 		private string WhatWeAreUpdating()
 		{
-			return string.Format("Updating server {0} database {1}", Database.Server.Instance.Address, Database.Name);
+			return string.Format("Updating server(s) \"{0}\" for database \"{1}\"", ServerAddresses(), Database.Name);
 		}
 
-		protected virtual void ApplyMigrations(IEnumerable<Migration> migrations)
+	    private string ServerAddresses()
+	    {
+            return String.Join(",", Database.Server.Instances.Select(s => s.Address.ToString()));
+	    }
+
+	    protected virtual void ApplyMigrations(IEnumerable<Migration> migrations)
 		{
 			migrations.ToList()
 			          .ForEach(ApplyMigration);
