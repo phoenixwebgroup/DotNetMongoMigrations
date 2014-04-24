@@ -42,7 +42,7 @@ namespace MongoMigrations
 
 		private string WhatWeAreUpdating()
 		{
-			return string.Format("Updating server(s) \"{0}\" for database {1}", ServerAddresses(), Database.Name);
+			return string.Format("Updating server(s) \"{0}\" for database \"{1}\"", ServerAddresses(), Database.Name);
 		}
 
 	    private string ServerAddresses()
