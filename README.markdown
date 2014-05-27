@@ -121,7 +121,7 @@ Document databases for the most do not support transactions with rollback, there
 
 Here is a sample powershell script we use to automate this deployment
 
-[Migration PowerShell Script](https://github.com/g0t4/DotNetMongoMigrations/blob/master/MigrateMongo.ps1)
+[Migration PowerShell Script](https://github.com/phoenixwebgroup/DotNetMongoMigrations/blob/master/MigrateMongo.ps1)
 
 It takes parameters for server name/ip, database name, base backup directory and migration dll path
 
