@@ -53,11 +53,11 @@
 			}
 		}
 
-		public virtual MigrationVersion LatestVersion()
+		public virtual Version LatestVersion()
 		{
 			if (!GetAllMigrations().Any())
 			{
-				return MigrationVersion.Default();
+				return new Version();
 			}
 			return GetAllMigrations()
 				.Max(m => m.Version);

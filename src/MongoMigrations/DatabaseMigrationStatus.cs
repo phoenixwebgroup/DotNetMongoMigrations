@@ -6,23 +6,23 @@
 
 	public class DatabaseMigrationStatus
 	{
-		private readonly MigrationRunner _Runner;
+		private readonly MigrationRunner _runner;
 
 		public string VersionCollectionName = "DatabaseVersion";
 
 		public DatabaseMigrationStatus(MigrationRunner runner)
 		{
-			_Runner = runner;
+			_runner = runner;
 		}
 
 		public virtual MongoCollection<AppliedMigration> GetMigrationsApplied()
 		{
-			return _Runner.Database.GetCollection<AppliedMigration>(VersionCollectionName);
+			return _runner.Database.GetCollection<AppliedMigration>(VersionCollectionName);
 		}
 
 		public virtual bool IsNotLatestVersion()
 		{
-			return _Runner.MigrationLocator.LatestVersion()
+			return _runner.MigrationLocator.LatestVersion()
 			       != GetVersion();
 		}
 
@@ -33,15 +33,15 @@
 				return;
 			}
 			var databaseVersion = GetVersion();
-			var migrationVersion = _Runner.MigrationLocator.LatestVersion();
+			var migrationVersion = _runner.MigrationLocator.LatestVersion();
 			throw new ApplicationException("Database is not the expected version, database is at version: " + databaseVersion + ", migrations are at version: " + migrationVersion);
 		}
 
-		public virtual MigrationVersion GetVersion()
+		public virtual Version GetVersion()
 		{
 			var lastAppliedMigration = GetLastAppliedMigration();
 			return lastAppliedMigration == null
-			       	? MigrationVersion.Default()
+			       	? new Version()
 			       	: lastAppliedMigration.Version;
 		}
 
@@ -67,15 +67,15 @@
 			GetMigrationsApplied().Save(appliedMigration);
 		}
 
-		public virtual void MarkUpToVersion(MigrationVersion version)
+		public virtual void MarkUpToVersion(Version version)
 		{
-			_Runner.MigrationLocator.GetAllMigrations()
+			_runner.MigrationLocator.GetAllMigrations()
 				.Where(m => m.Version <= version)
 				.ToList()
 				.ForEach(m => MarkVersion(m.Version));
 		}
 
-		public virtual void MarkVersion(MigrationVersion version)
+		public virtual void MarkVersion(Version version)
 		{
 			var appliedMigration = AppliedMigration.MarkerOnly(version);
 			GetMigrationsApplied().Insert(appliedMigration);

@@ -3,7 +3,6 @@
 	using System;
 	using System.Linq;
 	using MongoDB.Bson;
-	using MongoDB.Bson.Serialization;
 
 	public static class BsonDocumentExtensions
 	{
@@ -26,10 +25,7 @@
 		{
 			try
 			{
-				object id;
-				Type idNominalType;
-				IIdGenerator idGenerator;
-				return bsonDocument.GetDocumentId(out id, out idNominalType, out idGenerator);
+				return BsonTypeMapper.MapToDotNetValue(bsonDocument["_id"]);
 			}
 			catch (Exception)
 			{

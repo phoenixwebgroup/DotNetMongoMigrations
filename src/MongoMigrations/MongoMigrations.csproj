@@ -59,8 +59,6 @@
     <Compile Include="MigrationLocator.cs" />
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="MigrationException.cs" />
-    <Compile Include="MigrationVersion.cs" />
-    <Compile Include="MigrationVersionSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

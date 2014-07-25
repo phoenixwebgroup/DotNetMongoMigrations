@@ -3,23 +3,22 @@ namespace MongoMigrations
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-	using MongoDB.Bson.Serialization;
 	using MongoDB.Driver;
 
 	public class MigrationRunner
 	{
-		static MigrationRunner()
+		public MigrationRunner(string connectionString)
+			: this(new MongoUrl(connectionString))
 		{
-			Init();
 		}
 
-		public static void Init()
+		public MigrationRunner(string connectionString, string databaseName)
+			: this(new MongoClient(connectionString).GetServer().GetDatabase(databaseName))
 		{
-			BsonSerializer.RegisterSerializer(typeof (MigrationVersion), new MigrationVersionSerializer());
 		}
 
-		public MigrationRunner(string mongoServerLocation, string databaseName)
-			: this(MongoServer.Create(mongoServerLocation).GetDatabase(databaseName))
+		public MigrationRunner(MongoUrl mongoUrl)
+			: this(new MongoClient(mongoUrl).GetServer().GetDatabase(mongoUrl.DatabaseName))
 		{
 		}
 
@@ -87,7 +86,7 @@ namespace MongoMigrations
 			throw new MigrationException(message.ToString(), exception);
 		}
 
-		public virtual void UpdateTo(MigrationVersion updateToVersion)
+		public virtual void UpdateTo(Version updateToVersion)
 		{
 			var currentVersion = DatabaseStatus.GetLastAppliedMigration();
 			Console.WriteLine(new {Message = WhatWeAreUpdating(), currentVersion, updateToVersion, DatabaseName = Database.Name});

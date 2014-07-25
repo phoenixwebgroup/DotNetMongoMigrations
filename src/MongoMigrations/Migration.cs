@@ -1,13 +1,20 @@
+using System;
+
 namespace MongoMigrations
 {
 	using MongoDB.Driver;
 
 	public abstract class Migration
 	{
-		public MigrationVersion Version { get; protected set; }
+		public Version Version { get; protected set; }
 		public string Description { get; protected set; }
 
-		protected Migration(MigrationVersion version)
+		protected Migration(string version)
+		{
+			Version = new Version(version);
+		}
+
+		protected Migration(Version version)
 		{
 			Version = version;
 		}

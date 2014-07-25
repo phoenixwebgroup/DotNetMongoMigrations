@@ -9,7 +9,12 @@ namespace MongoMigrations
 	{
 		protected string CollectionName;
 
-		public CollectionMigration(MigrationVersion version, string collectionName) : base(version)
+		protected CollectionMigration(Version version, string collectionName) : base(version)
+		{
+			CollectionName = collectionName;
+		}
+
+		protected CollectionMigration(string version, string collectionName) : base(version)
 		{
 			CollectionName = collectionName;
 		}

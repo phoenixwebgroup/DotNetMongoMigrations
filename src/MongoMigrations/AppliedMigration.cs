@@ -19,17 +19,17 @@ namespace MongoMigrations
 		}
 
 		[BsonId]
-		public MigrationVersion Version { get; set; }
+		public Version Version { get; set; }
 		public string Description { get; set; }
 		public DateTime StartedOn { get; set; }
 		public DateTime? CompletedOn { get; set; }
 
 		public override string ToString()
 		{
-			return Version.ToString() + " started on " + StartedOn + " completed on " + CompletedOn;
+			return Version + " started on " + StartedOn + " completed on " + CompletedOn;
 		}
 
-		public static AppliedMigration MarkerOnly(MigrationVersion version)
+		public static AppliedMigration MarkerOnly(Version version)
 		{
 			return new AppliedMigration
 			       	{
