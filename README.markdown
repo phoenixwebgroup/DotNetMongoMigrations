@@ -1,3 +1,9 @@
+Build Status
+--
+<script type="text/javascript" src="http://teamcity.codebetter.com/externalStatus.html?js=1&buildTypeId=bt1262&withCss=true">
+</script>
+
+
 Why mongo migrations?
 --
 We no longer need create schema migrations, as this is a schemaless database, when we add collections (tables) or properties on our entities (columns), we don't need to run creation scripts.
@@ -170,3 +176,10 @@ Here is a sample test to rename a key on a document via the BsonDocument api, ob
 		}
 	}
 ```
+
+Thanks 
+--
+
+To Codebetter and JetBrains for hosting our builds
+
+<div style="background: #00578e url('http://www.jetbrains.com/img/banners/Codebetter.png') no-repeat 0 50%; margin:0;padding:0;text-decoration:none;text-indent:0;letter-spacing:-0.001em; width:728px; height:90px"> <a href="http://www.jetbrains.com/youtrack" title="YouTrack by JetBrains" style="margin: 60px 0 0 190px;padding: 0; float: left;font-size: 14px; background-image:none;border:0;color: #acc4f9; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">keyboard-centric bug tracker</a> <a href="http://www.jetbrains.com/teamcity" titl  e="TeamCity by JetBrains" style="margin:0 0 0 400px;padding:60px 0 2px 0;font-size:14px; background-image:none;border:0;display:block; color: #acc4f9; font-family: trebuchet ms,arial,sans-serif;font-weight: normal;text-align:left;">continuous integration server</a> </div>    
