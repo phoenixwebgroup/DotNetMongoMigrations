@@ -3,12 +3,16 @@ require 'albacore'
 
 $projectSolution = 'src/MongoMigrations.sln'
 $artifactsPath = "build"
-$nugetFeedPath = ENV["NuGetDevFeed"]
+$nugetFeedPath = ENV["NuGetDevFeed"] || '.'
 $srcPath = File.expand_path('src')
 
 task :build => [:build_release]
 
-msbuild :build_release => [:clean] do |msb|
+task :restore_packages do
+	sh "nuget restore #{$projectSolution}"
+end
+
+msbuild :build_release => [:clean, :restore_packages] do |msb|
   msb.properties :configuration => :Release
   msb.targets :Build
   msb.solution = $projectSolution
