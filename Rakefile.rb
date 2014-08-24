@@ -3,7 +3,7 @@ require 'albacore'
 
 $projectSolution = 'src/MongoMigrations.sln'
 $artifactsPath = "build"
-$nugetFeedPath = ENV["NuGetDevFeed"] || '.'
+$nugetFeedPath = ENV["NuGetDevFeed"] || 'build'
 $nugetExe = ENV["NUGET_EXE"] || 'nuget'
 $srcPath = File.expand_path('src')
 
