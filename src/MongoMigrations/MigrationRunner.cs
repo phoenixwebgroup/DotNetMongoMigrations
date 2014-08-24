@@ -19,7 +19,7 @@ namespace MongoMigrations
 		}
 
 		public MigrationRunner(string mongoServerLocation, string databaseName)
-			: this(MongoServer.Create(mongoServerLocation).GetDatabase(databaseName))
+			: this(new MongoClient(mongoServerLocation).GetServer().GetDatabase(databaseName))
 		{
 		}
 
