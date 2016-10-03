@@ -15,7 +15,7 @@
 			_Runner = runner;
 		}
 
-		public virtual MongoCollection<AppliedMigration> GetMigrationsApplied()
+		public virtual IMongoCollection<AppliedMigration> GetMigrationsApplied()
 		{
 			return _Runner.Database.GetCollection<AppliedMigration>(VersionCollectionName);
 		}
@@ -48,7 +48,7 @@
 		public virtual AppliedMigration GetLastAppliedMigration()
 		{
 			return GetMigrationsApplied()
-				.FindAll()
+                .Find(Builders<AppliedMigration>.Filter.Empty)
 				.ToList() // in memory but this will never get big enough to matter
 				.OrderByDescending(v => v.Version)
 				.FirstOrDefault();
@@ -57,14 +57,14 @@
 		public virtual AppliedMigration StartMigration(Migration migration)
 		{
 			var appliedMigration = new AppliedMigration(migration);
-			GetMigrationsApplied().Insert(appliedMigration);
+			GetMigrationsApplied().InsertOne(appliedMigration);
 			return appliedMigration;
 		}
 
 		public virtual void CompleteMigration(AppliedMigration appliedMigration)
 		{
 			appliedMigration.CompletedOn = DateTime.Now;
-			GetMigrationsApplied().Save(appliedMigration);
+			GetMigrationsApplied().ReplaceOne(x => x.Version == appliedMigration.Version, appliedMigration);
 		}
 
 		public virtual void MarkUpToVersion(MigrationVersion version)
@@ -78,7 +78,7 @@
 		public virtual void MarkVersion(MigrationVersion version)
 		{
 			var appliedMigration = AppliedMigration.MarkerOnly(version);
-			GetMigrationsApplied().Insert(appliedMigration);
+			GetMigrationsApplied().InsertOne(appliedMigration);
 		}
 	}
 }
