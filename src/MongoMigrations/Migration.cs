@@ -12,7 +12,7 @@ namespace MongoMigrations
 			Version = version;
 		}
 
-		public IMongoDatabase Database { get; set; }
+		public MongoDatabase Database { get; set; }
 
 		public abstract void Update();
 	}

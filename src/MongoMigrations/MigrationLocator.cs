@@ -15,8 +15,6 @@
 			MigrationFilters.Add(new ExcludeExperimentalMigrations());
 		}
 
-	    public IEnumerable<Migration> AllMigrations { get; private set; }
-
 		public virtual void LookForMigrationsInAssemblyOfType<T>()
 		{
 			var assembly = typeof (T).Assembly;
@@ -29,29 +27,18 @@
 			{
 				return;
 			}
-
 			Assemblies.Add(assembly);
 		}
 
 		public virtual IEnumerable<Migration> GetAllMigrations()
 		{
-		    if (this.AllMigrations != null && this.AllMigrations.Any())
-		    {
-		        return this.AllMigrations;
-		    }
-
-		    this.AllMigrations = this.Assemblies
-		        .SelectMany(this.GetMigrationsFromAssembly)
-		        .OrderBy(m => m.Version)
-                .ToList();
-
-		    return this.AllMigrations;
+			return Assemblies
+				.SelectMany(GetMigrationsFromAssembly)
+				.OrderBy(m => m.Version);
 		}
 
-	    protected virtual IEnumerable<Migration> GetMigrationsFromAssembly(Assembly assembly)
+		protected virtual IEnumerable<Migration> GetMigrationsFromAssembly(Assembly assembly)
 		{
-            Console.WriteLine($"Getting migrations from assembly: {assembly.FullName}");
-
 			try
 			{
 				return assembly.GetTypes()
@@ -68,20 +55,17 @@
 
 		public virtual MigrationVersion LatestVersion()
 		{
-		    var allMigrations = this.GetAllMigrations().ToList();
-
-			if (!allMigrations.Any())
+			if (!GetAllMigrations().Any())
 			{
 				return MigrationVersion.Default();
 			}
-
-			return allMigrations
-                .Max(m => m.Version);
+			return GetAllMigrations()
+				.Max(m => m.Version);
 		}
 
 		public virtual IEnumerable<Migration> GetMigrationsAfter(AppliedMigration currentVersion)
 		{
-			var migrations = this.GetAllMigrations();
+			var migrations = GetAllMigrations();
 
 			if (currentVersion != null)
 			{
