@@ -57,14 +57,14 @@
 		public virtual AppliedMigration StartMigration(Migration migration)
 		{
 			var appliedMigration = new AppliedMigration(migration);
-			GetMigrationsApplied().Insert(appliedMigration);
+			//// GetMigrationsApplied().Insert(appliedMigration);
 			return appliedMigration;
 		}
 
 		public virtual void CompleteMigration(AppliedMigration appliedMigration)
 		{
 			appliedMigration.CompletedOn = DateTime.Now;
-			GetMigrationsApplied().Save(appliedMigration);
+			GetMigrationsApplied().Insert(appliedMigration);
 		}
 
 		public virtual void MarkUpToVersion(MigrationVersion version)
