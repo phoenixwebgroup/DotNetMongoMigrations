@@ -65,12 +65,13 @@ namespace MongoMigrations
 			try
 			{
 				migration.Update();
+				
+				DatabaseStatus.CompleteMigration(appliedMigration);
 			}
 			catch (Exception exception)
 			{
 				OnMigrationException(migration, exception);
 			}
-			DatabaseStatus.CompleteMigration(appliedMigration);
 		}
 
 		protected virtual void OnMigrationException(Migration migration, Exception exception)
