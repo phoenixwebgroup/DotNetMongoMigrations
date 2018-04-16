@@ -9,8 +9,8 @@ namespace MongoMigrations
     {
         protected string CollectionName;
 
-        public CollectionMigration( MigrationVersion version, string collectionName )
-            : base( version )
+        public CollectionMigration(MigrationVersion version, string collectionName)
+            : base(version)
         {
             CollectionName = collectionName;
         }
@@ -18,8 +18,8 @@ namespace MongoMigrations
         public override void Update()
         {
             var collection = GetCollection();
-            var documents = GetDocuments( collection );
-            UpdateDocuments( collection, documents );
+            var documents = GetDocuments(collection);
+            UpdateDocuments(collection, documents);
         }
 
         public override void Rollback()
@@ -29,17 +29,17 @@ namespace MongoMigrations
             RollbackDocuments(collection, documents);
         }
 
-        public virtual void UpdateDocuments( IMongoCollection<BsonDocument> collection, IEnumerable<BsonDocument> documents )
+        public virtual void UpdateDocuments(IMongoCollection<BsonDocument> collection, IEnumerable<BsonDocument> documents)
         {
-            foreach( var document in documents )
+            foreach (var document in documents)
             {
                 try
                 {
-                    UpdateDocument( collection, document );
+                    UpdateDocument(collection, document);
                 }
-                catch( Exception exception )
+                catch (Exception exception)
                 {
-                    OnErrorUpdatingDocument( document, exception );
+                    OnErrorUpdatingDocument(document, exception);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace MongoMigrations
             }
         }
 
-        protected virtual void OnErrorUpdatingDocument( BsonDocument document, Exception exception )
+        protected virtual void OnErrorUpdatingDocument(BsonDocument document, Exception exception)
         {
             var message =
                 new
@@ -70,7 +70,7 @@ namespace MongoMigrations
                     MigrationVersion = Version,
                     MigrationDescription = Description
                 };
-            throw new MigrationException( message.ToString(), exception );
+            throw new MigrationException(message.ToString(), exception);
         }
 
         protected virtual void OnErrorRollingBackDocument(BsonDocument document, Exception exception)
@@ -87,17 +87,17 @@ namespace MongoMigrations
             throw new MigrationException(message.ToString(), exception);
         }
 
-        public abstract void UpdateDocument( IMongoCollection<BsonDocument> collection, BsonDocument document );
+        public abstract void UpdateDocument(IMongoCollection<BsonDocument> collection, BsonDocument document);
         public abstract void RollbackDocument(IMongoCollection<BsonDocument> collection, BsonDocument document);
 
         protected virtual IMongoCollection<BsonDocument> GetCollection()
         {
-            return Database.GetCollection<BsonDocument>( CollectionName );
+            return Database.GetCollection<BsonDocument>(CollectionName);
         }
 
-        protected virtual IEnumerable<BsonDocument> GetDocuments( IMongoCollection<BsonDocument> collection )
+        protected virtual IEnumerable<BsonDocument> GetDocuments(IMongoCollection<BsonDocument> collection)
         {
-            return collection.Find( Builders<BsonDocument>.Filter.Empty ).ToList();
+            return collection.Find(Builders<BsonDocument>.Filter.Empty).ToList();
         }
     }
 }
