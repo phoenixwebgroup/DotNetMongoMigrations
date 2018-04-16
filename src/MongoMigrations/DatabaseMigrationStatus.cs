@@ -79,6 +79,11 @@
 		{
 			var appliedMigration = AppliedMigration.MarkerOnly(version);
 			GetMigrationsApplied().InsertOne(appliedMigration);
-		}
-	}
+        }
+
+        public DeleteResult DeleteMigration(AppliedMigration appliedMigration)
+        {
+            return GetMigrationsApplied().DeleteOne(x => x.Version == appliedMigration.Version);
+        }
+    }
 }
