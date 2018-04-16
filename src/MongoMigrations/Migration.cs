@@ -15,5 +15,7 @@ namespace MongoMigrations
 		public IMongoDatabase Database { get; set; }
 
 		public abstract void Update();
+
+        public abstract void Rollback();
 	}
 }
