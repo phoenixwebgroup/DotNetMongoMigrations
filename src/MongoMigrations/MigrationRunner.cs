@@ -84,7 +84,8 @@ namespace MongoMigrations
 					DatabaseName = Database.DatabaseNamespace.DatabaseName
 				};
 			Console.WriteLine(message);
-			throw new MigrationException(message.ToString(), exception);
+            migration.Rollback();
+            throw new MigrationException(message.ToString(), exception);
 		}
 
 		public virtual void UpdateTo(MigrationVersion updateToVersion)
