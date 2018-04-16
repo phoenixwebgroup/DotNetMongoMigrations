@@ -12,8 +12,10 @@ namespace MongoMigrations
 			Version = version;
 		}
 
-		public MongoDatabase Database { get; set; }
+		public IMongoDatabase Database { get; set; }
 
 		public abstract void Update();
+
+        public abstract void Rollback();
 	}
 }

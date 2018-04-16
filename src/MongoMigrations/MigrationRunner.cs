@@ -19,18 +19,18 @@ namespace MongoMigrations
 		}
 
 		public MigrationRunner(string mongoServerLocation, string databaseName)
-			: this(new MongoClient(mongoServerLocation).GetServer().GetDatabase(databaseName))
+            : this( new MongoClient( mongoServerLocation ).GetDatabase( databaseName ) )
 		{
 		}
 
-		public MigrationRunner(MongoDatabase database)
+		public MigrationRunner(IMongoDatabase database)
 		{
 			Database = database;
 			DatabaseStatus = new DatabaseMigrationStatus(this);
 			MigrationLocator = new MigrationLocator();
 		}
 
-		public MongoDatabase Database { get; set; }
+        public IMongoDatabase Database { get; set; }
 		public MigrationLocator MigrationLocator { get; set; }
 		public DatabaseMigrationStatus DatabaseStatus { get; set; }
 
@@ -42,12 +42,12 @@ namespace MongoMigrations
 
 		private string WhatWeAreUpdating()
 		{
-			return string.Format("Updating server(s) \"{0}\" for database \"{1}\"", ServerAddresses(), Database.Name);
+			return string.Format("Updating server(s) \"{0}\" for database \"{1}\"", ServerAddresses(), DatabaseNamespace.Admin.DatabaseName);
 		}
 
 	    private string ServerAddresses()
 	    {
-            return String.Join(",", Database.Server.Instances.Select(s => s.Address.ToString()));
+            return String.Join(",", Database.Client.Settings.Servers.Select(server => String.Format("{0}{1}{2}:{3}{4}{5}", "{", server.Host, "}", "{", server.Port, "}")));
 	    }
 
 	    protected virtual void ApplyMigrations(IEnumerable<Migration> migrations)
@@ -58,19 +58,19 @@ namespace MongoMigrations
 
 		protected virtual void ApplyMigration(Migration migration)
 		{
-			Console.WriteLine(new {Message = "Applying migration", migration.Version, migration.Description, DatabaseName = Database.Name});
+			Console.WriteLine(new {Message = "Applying migration", migration.Version, migration.Description, DatabaseName = Database.DatabaseNamespace.DatabaseName});
 
 			var appliedMigration = DatabaseStatus.StartMigration(migration);
 			migration.Database = Database;
 			try
 			{
 				migration.Update();
-			}
+                DatabaseStatus.CompleteMigration(appliedMigration);
+            }
 			catch (Exception exception)
 			{
 				OnMigrationException(migration, exception);
 			}
-			DatabaseStatus.CompleteMigration(appliedMigration);
 		}
 
 		protected virtual void OnMigrationException(Migration migration, Exception exception)
@@ -81,16 +81,18 @@ namespace MongoMigrations
 					migration.Version,
 					Name = migration.GetType(),
 					migration.Description,
-					DatabaseName = Database.Name
+					DatabaseName = Database.DatabaseNamespace.DatabaseName
 				};
 			Console.WriteLine(message);
-			throw new MigrationException(message.ToString(), exception);
+            migration.Rollback();
+            DatabaseStatus.DeleteMigration(new AppliedMigration(migration));
+            throw new MigrationException(message.ToString(), exception);
 		}
 
 		public virtual void UpdateTo(MigrationVersion updateToVersion)
 		{
 			var currentVersion = DatabaseStatus.GetLastAppliedMigration();
-			Console.WriteLine(new {Message = WhatWeAreUpdating(), currentVersion, updateToVersion, DatabaseName = Database.Name});
+			Console.WriteLine(new {Message = WhatWeAreUpdating(), currentVersion, updateToVersion, DatabaseName = Database.DatabaseNamespace.DatabaseName});
 
 			var migrations = MigrationLocator.GetMigrationsAfter(currentVersion)
 			                                 .Where(m => m.Version <= updateToVersion);
